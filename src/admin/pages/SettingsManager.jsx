@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, AlertCircle, Settings, Building2, GraduationCap, Share2, Plus, Trash2, Image, ExternalLink } from 'lucide-react';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import { buildMediaUrl } from '../../lib/api';
 
 const FALLBACK_SETTINGS = {
   school_name: 'SMA Labschool UNESA 1',
@@ -235,13 +236,13 @@ export default function SettingsManager() {
                     {settings.admission_poster_url && (
                       <div>
                         <p className="text-[0.7rem] font-bold text-slate-500 mb-2">Preview Poster PPDB:</p>
-                        <img src={settings.admission_poster_url} alt="Poster Preview" className="h-40 object-cover rounded-xl border border-slate-300" onError={(e) => { e.target.style.display = 'none'; }} />
+                        <img src={buildMediaUrl(settings.admission_poster_url)} alt="Poster Preview" className="h-40 object-cover rounded-xl border border-slate-300" onError={(e) => { e.target.style.display = 'none'; }} />
                       </div>
                     )}
                     {settings.admission_flow_image_url && (
                       <div>
                         <p className="text-[0.7rem] font-bold text-slate-500 mb-2">Preview Gambar Alur Pendaftaran:</p>
-                        <img src={settings.admission_flow_image_url} alt="Flow Preview" className="h-40 object-cover rounded-xl border border-slate-300" onError={(e) => { e.target.style.display = 'none'; }} />
+                        <img src={buildMediaUrl(settings.admission_flow_image_url)} alt="Flow Preview" className="h-40 object-cover rounded-xl border border-slate-300" onError={(e) => { e.target.style.display = 'none'; }} />
                       </div>
                     )}
                   </div>

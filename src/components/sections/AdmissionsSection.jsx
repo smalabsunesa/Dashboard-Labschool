@@ -9,7 +9,7 @@ import Skeleton from '../common/Skeleton';
 import ImageWithSkeleton from '../common/ImageWithSkeleton';
 import useFaqs from '../../hooks/useFaqs';
 import { useQuery } from '@tanstack/react-query';
-import { fetchSettings } from '../../lib/api';
+import { fetchSettings, buildMediaUrl } from '../../lib/api';
 
 const whyChooseUs = [
   { icon: GraduationCap, title: 'Kurikulum SKS Fleksibel', desc: 'Selesaikan studi sesuai kemampuan dengan Sistem Kredit Semester yang inovatif.' },
@@ -105,8 +105,8 @@ export default function AdmissionsSection() {
 
   const bridgingTitle = settings.admission_bridging_title || 'Investasi Terbaik untuk Masa Depan Anak Anda';
   const bridgingDesc = settings.admission_bridging_desc || 'Bergabunglah dengan komunitas pelajar unggulan yang tidak hanya cerdas secara akademik, tetapi juga berkarakter, berdaya saing global, dan siap memimpin di era digital.';
-  const posterUrl = settings.admission_poster_url || '/spmb.png';
-  const flowImageUrl = settings.admission_flow_image_url || '';
+  const posterUrl = buildMediaUrl(settings.admission_poster_url) || '/spmb.png';
+  const flowImageUrl = buildMediaUrl(settings.admission_flow_image_url) || '';
   const registerUrl = settings.admission_register_url || 'https://lynk.id/labschoolunesa/opj7kdqmrn7x';
   const whatsappUrl = settings.contact_whatsapp_url || 'https://wa.me/62821232937212';
 

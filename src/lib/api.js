@@ -78,6 +78,13 @@ const FALLBACK_NEWS = [
 
 export function buildMediaUrl(path = '') {
   if (!path) return null;
+  
+  // Auto-convert Google Drive file view links to direct image CDN URLs
+  const gDriveMatch = path.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([a-zA-Z0-9_-]+)/);
+  if (gDriveMatch && gDriveMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${gDriveMatch[1]}`;
+  }
+
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }
