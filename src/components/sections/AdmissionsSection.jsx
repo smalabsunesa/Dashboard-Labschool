@@ -8,9 +8,8 @@ import SectionWrapper from './SectionWrapper';
 import Skeleton from '../common/Skeleton';
 import ImageWithSkeleton from '../common/ImageWithSkeleton';
 import useFaqs from '../../hooks/useFaqs';
-
-const admissionsPosterSrc = '/spmb.png';
-const registerNowHref = 'https://lynk.id/labschoolunesa/opj7kdqmrn7x';
+import { useQuery } from '@tanstack/react-query';
+import { fetchSettings } from '../../lib/api';
 
 const whyChooseUs = [
   { icon: GraduationCap, title: 'Kurikulum SKS Fleksibel', desc: 'Selesaikan studi sesuai kemampuan dengan Sistem Kredit Semester yang inovatif.' },
@@ -21,14 +20,14 @@ const whyChooseUs = [
   { icon: Sparkles, title: 'School of Character', desc: 'Pembentukan akhlak mulia, jiwa kepemimpinan, dan etos wirausaha sejak tahap awal.' },
 ];
 
-const registrationFlow = [
+const fallbackRegistrationFlow = [
   { step: '01', icon: FileText, title: 'Isi Formulir Online', desc: 'Daftarkan diri melalui portal PPDB resmi SMA Labschool UNESA 1.' },
   { step: '02', icon: ClipboardList, title: 'Unggah Dokumen', desc: 'Upload rapor, sertifikat prestasi, & dokumen persyaratan yang dibutuhkan.' },
   { step: '03', icon: UserCheck, title: 'Seleksi & Tes', desc: 'Ikuti tes potensi & wawancara untuk penjurusan dan program khusus.' },
   { step: '04', icon: CreditCard, title: 'Pengumuman & Daftar Ulang', desc: 'Cek pengumuman hasil seleksi dan selesaikan proses daftar ulang.' },
 ];
 
-const discounts = [
+const fallbackDiscounts = [
   { label: 'Alumni SMP Labschool UNESA', value: '25%', icon: GraduationCap, color: 'bg-blue-50 border-blue-200 text-blue-700' },
   { label: 'Mendaftar 2 anak kandung / bersaudara di Labschool UNESA', value: '25%', icon: Users, color: 'bg-purple-50 border-purple-200 text-purple-700' },
   { label: 'Anak kandung Dosen / Karyawan UNESA', value: '20%', icon: Building2, color: 'bg-slate-50 border-slate-200 text-slate-700' },
@@ -98,9 +97,38 @@ function FAQItem({ item, index, isOpen, onToggle }) {
 }
 
 export default function AdmissionsSection() {
-  const { data: faqItemsRaw, loading: faqLoading, error: faqError } = useFaqs();
+  const { data: faqItemsRaw, loading: faqLoading } = useFaqs();
   const faqItems = faqItemsRaw && faqItemsRaw.length > 0 ? faqItemsRaw : fallbackFaqs;
   const [openFaq, setOpenFaq] = React.useState(0);
+
+  const { data: settings = {} } = useQuery({ queryKey: ['settings'], queryFn: fetchSettings });
+
+  const bridgingTitle = settings.admission_bridging_title || 'Investasi Terbaik untuk Masa Depan Anak Anda';
+  const bridgingDesc = settings.admission_bridging_desc || 'Bergabunglah dengan komunitas pelajar unggulan yang tidak hanya cerdas secara akademik, tetapi juga berkarakter, berdaya saing global, dan siap memimpin di era digital.';
+  const posterUrl = settings.admission_poster_url || '/spmb.png';
+  const flowImageUrl = settings.admission_flow_image_url || '';
+  const registerUrl = settings.admission_register_url || 'https://lynk.id/labschoolunesa/opj7kdqmrn7x';
+  const whatsappUrl = settings.contact_whatsapp_url || 'https://wa.me/62821232937212';
+
+  // Parse discounts JSON if available
+  let discountItems = fallbackDiscounts;
+  if (settings.admission_discounts_json) {
+    try {
+      const parsed = typeof settings.admission_discounts_json === 'string'
+        ? JSON.parse(settings.admission_discounts_json)
+        : settings.admission_discounts_json;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        discountItems = parsed.map((item, idx) => ({
+          label: item.label,
+          value: item.value,
+          icon: fallbackDiscounts[idx % fallbackDiscounts.length].icon,
+          color: item.color || fallbackDiscounts[idx % fallbackDiscounts.length].color,
+        }));
+      }
+    } catch (e) {
+      discountItems = fallbackDiscounts;
+    }
+  }
 
   return (
     <SectionWrapper id="admissions" title="Admissions (PPDB)">
@@ -116,10 +144,10 @@ export default function AdmissionsSection() {
               <Sparkles size={13} /> Mengapa SMA Labschool UNESA 1?
             </span>
             <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Investasi Terbaik untuk Masa Depan Anak Anda
+              {bridgingTitle}
             </h3>
             <p className="mt-2 text-sm sm:text-base text-slate-500 leading-relaxed">
-              Bergabunglah dengan komunitas pelajar unggulan yang tidak hanya cerdas secara akademik, tetapi juga berkarakter, berdaya saing global, dan siap memimpin di era digital.
+              {bridgingDesc}
             </p>
           </div>
 
@@ -149,7 +177,7 @@ export default function AdmissionsSection() {
           {/* Poster */}
           <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200 bg-slate-100 aspect-[4/5] max-h-[600px]">
             <ImageWithSkeleton
-              src={admissionsPosterSrc}
+              src={posterUrl}
               alt="Poster PPDB SMA Labschool UNESA 1"
               className="w-full h-full"
               imageClassName="object-cover w-full h-full"
@@ -162,7 +190,7 @@ export default function AdmissionsSection() {
           <div className="space-y-6">
             <div>
               <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wide bg-blue-100 text-blue-700 mb-3">
-                PPDB 2025 / 2026
+                PPDB RESMI LABSCHOOL
               </span>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 Daftarkan Putra-Putri Anda Sekarang
@@ -190,7 +218,7 @@ export default function AdmissionsSection() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3">
               <a
-                href={registerNowHref}
+                href={registerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-extrabold text-sm shadow-lg hover:shadow-orange-300/50 hover:-translate-y-0.5 transition-all"
@@ -200,7 +228,7 @@ export default function AdmissionsSection() {
                 <ArrowRight size={16} />
               </a>
               <a
-                href="https://wa.me/6282132937212"
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-white border-2 border-slate-200 text-slate-800 font-extrabold text-sm hover:border-orange-400 hover:text-orange-600 transition-all"
@@ -212,40 +240,52 @@ export default function AdmissionsSection() {
         </div>
 
         {/* ========================================================= */}
-        {/* 3. ALUR PENDAFTARAN (FLOW DIAGRAM VISUAL)                 */}
+        {/* 3. ALUR PENDAFTARAN (FLOW IMAGE OR FLOW CARDS)            */}
         {/* ========================================================= */}
         <div className="space-y-6">
           <div className="text-center max-w-xl mx-auto">
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wide bg-slate-900 text-white mb-3">
               Alur Pendaftaran PPDB
             </span>
-            <h3 className="text-2xl font-extrabold text-slate-900">4 Langkah Mudah Bergabung</h3>
+            <h3 className="text-2xl font-extrabold text-slate-900">Alur Mudah Bergabung</h3>
           </div>
 
-          <div className="relative">
-            {/* Connector line (desktop) */}
-            <div className="hidden lg:block absolute top-14 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-orange-200 via-orange-400 to-orange-200 z-0" />
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-              {registrationFlow.map((step, idx) => {
-                const Icon = step.icon;
-                return (
-                  <div key={idx} className="flex flex-col items-center text-center">
-                    <div className="relative mb-4">
-                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-500 to-amber-400 flex items-center justify-center shadow-lg shadow-orange-200">
-                        <Icon size={28} className="text-white" />
-                      </div>
-                      <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-slate-900 text-white text-[0.6rem] font-extrabold flex items-center justify-center shadow">
-                        {step.step}
-                      </span>
-                    </div>
-                    <h4 className="font-extrabold text-slate-900 text-sm">{step.title}</h4>
-                    <p className="mt-1 text-xs text-slate-500 leading-relaxed">{step.desc}</p>
-                  </div>
-                );
-              })}
+          {flowImageUrl ? (
+            /* Custom Infographic Image Uploaded in CMS */
+            <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-200 bg-white max-w-4xl mx-auto">
+              <ImageWithSkeleton
+                src={flowImageUrl}
+                alt="Infografis Alur Pendaftaran PPDB SMA Labschool UNESA 1"
+                className="w-full h-auto"
+                imageClassName="object-contain w-full h-auto"
+                fallbackClassName="bg-slate-100 h-64"
+              />
             </div>
-          </div>
+          ) : (
+            /* Default 4-step Diagram Cards */
+            <div className="relative">
+              <div className="hidden lg:block absolute top-14 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-orange-200 via-orange-400 to-orange-200 z-0" />
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+                {fallbackRegistrationFlow.map((step, idx) => {
+                  const Icon = step.icon;
+                  return (
+                    <div key={idx} className="flex flex-col items-center text-center">
+                      <div className="relative mb-4">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-orange-500 to-amber-400 flex items-center justify-center shadow-lg shadow-orange-200">
+                          <Icon size={28} className="text-white" />
+                        </div>
+                        <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-slate-900 text-white text-[0.6rem] font-extrabold flex items-center justify-center shadow">
+                          {step.step}
+                        </span>
+                      </div>
+                      <h4 className="font-extrabold text-slate-900 text-sm">{step.title}</h4>
+                      <p className="mt-1 text-xs text-slate-500 leading-relaxed">{step.desc}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ========================================================= */}
@@ -264,8 +304,8 @@ export default function AdmissionsSection() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {discounts.map((item, idx) => {
-              const Icon = item.icon;
+            {discountItems.map((item, idx) => {
+              const Icon = item.icon || GraduationCap;
               return (
                 <div key={idx} className={`flex items-center gap-4 p-4 rounded-2xl border ${item.color}`}>
                   <div className="w-10 h-10 rounded-xl bg-white/80 flex items-center justify-center shrink-0 shadow-sm">

@@ -1,63 +1,7 @@
 import React from 'react';
 import { Phone, Instagram, Globe, GraduationCap, Mail, ArrowUpRight, ExternalLink } from 'lucide-react';
-
-const contactChannels = [
-  {
-    id: 'whatsapp',
-    title: 'WhatsApp Official',
-    value: '+62 821-232-937-212',
-    href: 'https://wa.me/62821232937212',
-    description: 'Respon cepat untuk pertanyaan & layanan informasi',
-    icon: Phone,
-    iconBg: 'bg-emerald-500 text-white',
-    hoverBorder: 'hover:border-emerald-400 hover:shadow-emerald-500/10',
-    ctaText: 'Chat WhatsApp',
-  },
-  {
-    id: 'instagram',
-    title: 'Instagram Official',
-    value: '@smalabschoolunesa.official',
-    href: 'https://instagram.com/smalabschoolunesa.official',
-    description: 'Dokumentasi acara, kegiatan & prestasi siswa',
-    icon: Instagram,
-    iconBg: 'bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white',
-    hoverBorder: 'hover:border-pink-400 hover:shadow-pink-500/10',
-    ctaText: 'Kunjungi Instagram',
-  },
-  {
-    id: 'website',
-    title: 'Website Resmi',
-    value: 'smalabschoolunesa1.sch.id',
-    href: 'https://smalabschoolunesa1.sch.id',
-    description: 'Portal informasi resmi SMA Labschool UNESA 1',
-    icon: Globe,
-    iconBg: 'bg-blue-600 text-white',
-    hoverBorder: 'hover:border-blue-400 hover:shadow-blue-500/10',
-    ctaText: 'Buka Website',
-  },
-  {
-    id: 'ppdb',
-    title: 'Pendaftaran PPDB',
-    value: 'lynk.id/labschoolunesa',
-    href: 'https://lynk.id/labschoolunesa/opj7kdqmrn7x',
-    description: 'Portal resmi pendaftaran peserta didik baru 2026/2027',
-    icon: GraduationCap,
-    iconBg: 'bg-orange-500 text-white',
-    hoverBorder: 'hover:border-orange-400 hover:shadow-orange-500/10',
-    ctaText: 'Daftar PPDB Sekarang',
-  },
-  {
-    id: 'email',
-    title: 'Email Sekolah',
-    value: 'smalabschoolunesa@gmail.com',
-    href: 'mailto:smalabschoolunesa@gmail.com',
-    description: 'Kirim surat resmi & administrasi sekolah',
-    icon: Mail,
-    iconBg: 'bg-indigo-600 text-white',
-    hoverBorder: 'hover:border-indigo-400 hover:shadow-indigo-500/10',
-    ctaText: 'Kirim Email',
-  },
-];
+import { useQuery } from '@tanstack/react-query';
+import { fetchSettings } from '../lib/api';
 
 function BatikFooterBackground() {
   return (
@@ -85,6 +29,66 @@ function BatikFooterBackground() {
 }
 
 export default function Footer() {
+  const { data: settings = {} } = useQuery({ queryKey: ['settings'], queryFn: fetchSettings });
+
+  const contactChannels = [
+    {
+      id: 'whatsapp',
+      title: 'WhatsApp Official',
+      value: settings.contact_whatsapp_num || '+62 821-232-937-212',
+      href: settings.contact_whatsapp_url || 'https://wa.me/62821232937212',
+      description: 'Respon cepat untuk pertanyaan & layanan informasi',
+      icon: Phone,
+      iconBg: 'bg-emerald-500 text-white',
+      hoverBorder: 'hover:border-emerald-400 hover:shadow-emerald-500/10',
+      ctaText: 'Chat WhatsApp',
+    },
+    {
+      id: 'instagram',
+      title: 'Instagram Official',
+      value: settings.contact_instagram_handle || '@smalabschoolunesa.official',
+      href: settings.contact_instagram_url || 'https://instagram.com/smalabschoolunesa.official',
+      description: 'Dokumentasi acara, kegiatan & prestasi siswa',
+      icon: Instagram,
+      iconBg: 'bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white',
+      hoverBorder: 'hover:border-pink-400 hover:shadow-pink-500/10',
+      ctaText: 'Kunjungi Instagram',
+    },
+    {
+      id: 'website',
+      title: 'Website Resmi',
+      value: settings.contact_website_url ? settings.contact_website_url.replace(/^https?:\/\//, '') : 'smalabschoolunesa1.sch.id',
+      href: settings.contact_website_url || 'https://smalabschoolunesa1.sch.id',
+      description: 'Portal informasi resmi SMA Labschool UNESA 1',
+      icon: Globe,
+      iconBg: 'bg-blue-600 text-white',
+      hoverBorder: 'hover:border-blue-400 hover:shadow-blue-500/10',
+      ctaText: 'Buka Website',
+    },
+    {
+      id: 'ppdb',
+      title: 'Pendaftaran PPDB',
+      value: settings.admission_register_url ? settings.admission_register_url.replace(/^https?:\/\//, '') : 'lynk.id/labschoolunesa',
+      href: settings.admission_register_url || 'https://lynk.id/labschoolunesa/opj7kdqmrn7x',
+      description: 'Portal resmi pendaftaran peserta didik baru 2026/2027',
+      icon: GraduationCap,
+      iconBg: 'bg-orange-500 text-white',
+      hoverBorder: 'hover:border-orange-400 hover:shadow-orange-500/10',
+      ctaText: 'Daftar PPDB Sekarang',
+    },
+    {
+      id: 'email',
+      title: 'Email Sekolah',
+      value: settings.contact_email || 'smalabschoolunesa@gmail.com',
+      href: `mailto:${settings.contact_email || 'smalabschoolunesa@gmail.com'}`,
+      description: 'Kirim surat resmi & administrasi sekolah',
+      icon: Mail,
+      iconBg: 'bg-indigo-600 text-white',
+      hoverBorder: 'hover:border-indigo-400 hover:shadow-indigo-500/10',
+      ctaText: 'Kirim Email',
+    },
+  ];
+
   return (
     <footer className="relative overflow-hidden border-t border-slate-200 bg-slate-900 text-slate-100" id="contact">
       <BatikFooterBackground />
@@ -100,16 +104,16 @@ export default function Footer() {
                 className="h-10 w-auto bg-white p-1 rounded-md"
               />
               <span className="text-2xl font-extrabold text-white tracking-tight">
-                SMA Labschool UNESA 1
+                {settings.school_name || 'SMA Labschool UNESA 1'}
               </span>
             </div>
             <p className="text-slate-400 text-sm max-w-xl leading-relaxed">
-              Pusat inovasi pendidikan berbasis digital yang menginspirasi peserta didik untuk tumbuh, berkarakter, dan berprestasi unggul.
+              {settings.profile_summary || 'Pusat inovasi pendidikan berbasis digital yang menginspirasi peserta didik untuk tumbuh, berkarakter, dan berprestasi unggul.'}
             </p>
           </div>
 
           <div className="flex items-center gap-4 text-xs text-slate-400">
-            <span>Jl. Citra Raya Unesa, Lakarsantri, Surabaya</span>
+            <span>{settings.school_address || 'Jl. Citra Raya Unesa, Lakarsantri, Surabaya'}</span>
           </div>
         </div>
 
@@ -170,7 +174,7 @@ export default function Footer() {
             <a href="#admissions" className="hover:text-white transition-colors">Admissions</a>
           </div>
 
-          <p>© {new Date().getFullYear()} SMA Labschool UNESA 1. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} {settings.school_name || 'SMA Labschool UNESA 1'}. All rights reserved.</p>
         </div>
       </div>
     </footer>

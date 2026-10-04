@@ -279,9 +279,34 @@ export async function fetchExtracurriculars() {
 export async function fetchSettings() {
   const FALLBACK_SETTINGS = {
     school_name: 'SMA Labschool UNESA 1',
+    school_address: 'Jl. Citra Raya Unesa, Lakarsantri, Surabaya',
     principal_name: 'Kepala Sekolah',
     principal_message: 'Mendidik dengan karakter, menginspirasi dengan inovasi. Selamat datang di portal resmi SMA Labschool UNESA 1. Kami berkomitmen mencetak generasi cerdas, berkarakter unggul, dan siap menghadapi tantangan masa depan melalui program pendidikan inovatif dan bertaraf global.',
-    profile_summary: 'Kami adalah institusi pendidikan menengah tingkat atas yang berada di bawah naungan Yayasan Universitas Negeri Surabaya (UNESA). Dikenal dengan sebutan "School of Character", kami tidak hanya mengedepankan prestasi akademik, namun juga menjunjung tinggi nilai-nilai budi pekerti luhur.'
+    profile_summary: 'Kami adalah institusi pendidikan menengah tingkat atas yang berada di bawah naungan Yayasan Universitas Negeri Surabaya (UNESA). Dikenal dengan sebutan "School of Character", kami tidak hanya mengedepankan prestasi akademik, namun juga menjunjung tinggi nilai-nilai budi pekerti luhur.',
+    
+    // Admissions (PPDB) Settings
+    admission_bridging_title: 'Investasi Terbaik untuk Masa Depan Anak Anda',
+    admission_bridging_desc: 'Bergabunglah dengan komunitas pelajar unggulan yang tidak hanya cerdas secara akademik, tetapi juga berkarakter, berdaya saing global, dan siap memimpin di era digital.',
+    admission_poster_url: '/spmb.png',
+    admission_flow_image_url: '',
+    admission_register_url: 'https://lynk.id/labschoolunesa/opj7kdqmrn7x',
+    admission_discounts_json: JSON.stringify([
+      { label: 'Alumni SMP Labschool UNESA', value: '25%', color: 'bg-blue-50 border-blue-200 text-blue-700' },
+      { label: 'Mendaftar 2 anak kandung / bersaudara di Labschool UNESA', value: '25%', color: 'bg-purple-50 border-purple-200 text-purple-700' },
+      { label: 'Anak kandung Dosen / Karyawan UNESA', value: '20%', color: 'bg-slate-50 border-slate-200 text-slate-700' },
+      { label: 'Juara Internasional (Peringkat 1–3)', value: '30%', color: 'bg-amber-50 border-amber-200 text-amber-700' },
+      { label: 'Juara Nasional (Peringkat 1–3)', value: '20%', color: 'bg-orange-50 border-orange-200 text-orange-700' },
+      { label: 'Juara Daerah / Propinsi (Peringkat 1–3)', value: '10%', color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+    ]),
+
+    // Social Media & Contact Settings
+    contact_whatsapp_num: '+62 821-232-937-212',
+    contact_whatsapp_url: 'https://wa.me/62821232937212',
+    contact_instagram_handle: '@smalabschoolunesa.official',
+    contact_instagram_url: 'https://instagram.com/smalabschoolunesa.official',
+    contact_email: 'smalabschoolunesa@gmail.com',
+    contact_website_url: 'https://smalabschoolunesa1.sch.id',
+    contact_tiktok_url: 'https://tiktok.com/@smalabschoolunesa',
   };
 
   if (isSupabaseConfigured && supabase) {
@@ -289,8 +314,10 @@ export async function fetchSettings() {
     if (!error && data && data.length > 0) {
       const merged = { ...FALLBACK_SETTINGS };
       data.forEach(item => {
-        if (merged[item.key] !== undefined) {
-           merged[item.key] = item.value;
+        if (item.key && merged[item.key] !== undefined) {
+          merged[item.key] = item.value;
+        } else if (item.key) {
+          merged[item.key] = item.value;
         }
       });
       return merged;
