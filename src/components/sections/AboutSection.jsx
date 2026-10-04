@@ -140,7 +140,7 @@ export default function AboutSection() {
                     <span>Visi Sekolah</span>
                   </div>
                   <p className="text-slate-600 leading-relaxed text-[0.75rem]">
-                    Pusat inovasi pendidikan menyiapkan generasi beriman, beradab, berilmu, & berprestasi.
+                    SMA Labschool Unesa 1 memiliki visi menjadi pusat inovasi pendidikan untuk menyiapkan generasi yang beriman, beradab, dan berprestasi.
                   </p>
                 </div>
 
@@ -150,7 +150,7 @@ export default function AboutSection() {
                     <span>Misi Sekolah</span>
                   </div>
                   <p className="text-slate-600 leading-relaxed text-[0.75rem]">
-                    Inovasi inspiratif, penguatan religius & kebangsaan, serta lulusan berjiwa wirausaha.
+                    Misi yang dilakukan adalah mewujudkan inovasi pendidikan yang inspiratif, berorientasi nasional, serta memperkuat nilai religius, budaya, dan kebangsaan untuk menghasilkan lulusan kompeten, berjiwa wirausaha, dan siap berdaya saing di era digital.
                   </p>
                 </div>
               </div>

@@ -32,7 +32,7 @@ const programCards = [
   },
   {
     id: 'preuni',
-    titleLines: ['PREUNIVERSITY', 'CLASS'],
+    titleLines: ['PRE-UNIVERSITY', 'CLASS'],
     icon: BarChart3,
     circleBg: 'bg-[#F59E0B]', // Vibrant Amber / Orange
   },
@@ -77,7 +77,7 @@ export default function Hero() {
               className="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full border mb-4 shadow-sm"
               style={{ borderColor: primaryOrange, color: primaryOrange, background: '#FFF8F0' }}
             >
-              Trusted. Bright. Caring.
+              School Of Charater
             </span>
             <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
               SMA Labschool UNESA 1
@@ -131,8 +131,8 @@ export default function Hero() {
                 loading="eager"
               />
               <div className="relative text-center p-6 rounded-2xl bg-white/80 backdrop-blur-md shadow-lg border border-white/60 max-w-sm">
-                <p className="text-sm font-medium text-slate-900">“Education is the most powerful weapon which you can use to change the world.”</p>
-                <p className="mt-2 font-bold text-slate-900 text-xs">— Nelson Mandela</p>
+                <p className="text-sm font-medium text-slate-900">“Bila kaum muda yang telah belajar di sekolah dan menganggap dirinya terlalu tinggi dan pintar untuk melebur dengan masyarakat yang bekerja dengan cangkul dan hanya memiliki cita-cita yang sederhana, maka lebih baik pendidikan itu tidak diberikan sama sekali.”</p>
+                <p className="mt-2 font-bold text-slate-900 text-xs">— Tan Malaka</p>
               </div>
             </div>
           </div>
