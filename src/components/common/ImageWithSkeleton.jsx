@@ -1,4 +1,5 @@
 import React from 'react';
+import { buildMediaUrl } from '../../lib/api';
 
 export default function ImageWithSkeleton({
   src,
@@ -10,7 +11,12 @@ export default function ImageWithSkeleton({
   onError,
   ...imgProps
 }) {
-  const [loaded, setLoaded] = React.useState(!src);
+  const finalSrc = buildMediaUrl(src);
+  const [loaded, setLoaded] = React.useState(!finalSrc);
+
+  React.useEffect(() => {
+    setLoaded(!finalSrc);
+  }, [finalSrc]);
 
   const handleLoad = (event) => {
     setLoaded(true);
@@ -29,9 +35,9 @@ export default function ImageWithSkeleton({
   return (
     <div className={`relative overflow-hidden ${className}`}>
       {!loaded && <div className="absolute inset-0 h-full w-full animate-pulse bg-slate-200" />}
-      {src ? (
+      {finalSrc ? (
         <img
-          src={src}
+          src={finalSrc}
           alt={alt}
           className={`h-full w-full ${imageClassName}`}
           loading="lazy"

@@ -8,6 +8,45 @@ import useNews from '../../hooks/useNews';
 
 const primaryOrange = '#FF7A00';
 
+function SpotlightImageItem({ item, isActive }) {
+  const [isTall, setIsTall] = useState(false);
+  const containerRef = useRef(null);
+
+  const handleLoad = (e) => {
+    const img = e.target;
+    if (img && containerRef.current) {
+      const imgRatio = img.naturalHeight / img.naturalWidth;
+      const containerRatio = containerRef.current.clientHeight / containerRef.current.clientWidth;
+      if (imgRatio > containerRatio) {
+        setIsTall(true);
+      }
+    }
+  };
+
+  return (
+    <div
+      ref={containerRef}
+      className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+        isActive ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+      }`}
+    >
+      <ImageWithSkeleton
+        src={item.imageUrl}
+        alt={item.imageAlt || item.title}
+        className="w-full h-full"
+        imageClassName={`object-cover w-full h-full ${
+          isTall ? 'animate-vertical-pan scale-110' : 'scale-105'
+        } transition-all duration-1000`}
+        fallbackClassName="bg-slate-800"
+        onLoad={handleLoad}
+      />
+      {/* Gradient Overlays for High Contrast Readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-900/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-transparent hidden md:block" />
+    </div>
+  );
+}
+
 function SpotlightSlider({ items, onOpenStory }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -42,23 +81,11 @@ function SpotlightSlider({ items, onOpenStory }) {
       {/* Background Image Carousel Container */}
       <div className="relative min-h-[380px] md:min-h-[440px] w-full overflow-hidden flex items-end">
         {items.map((item, index) => (
-          <div
+          <SpotlightImageItem
             key={item.id}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
-            }`}
-          >
-            <ImageWithSkeleton
-              src={item.imageUrl}
-              alt={item.imageAlt || item.title}
-              className="w-full h-full"
-              imageClassName="object-cover w-full h-full scale-105 transition-transform duration-1000"
-              fallbackClassName="bg-slate-800"
-            />
-            {/* Gradient Overlays for High Contrast Readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-900/20" />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-transparent hidden md:block" />
-          </div>
+            item={item}
+            isActive={index === currentIndex}
+          />
         ))}
 
         {/* Spotlight Content Overlay */}

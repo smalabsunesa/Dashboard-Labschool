@@ -45,4 +45,20 @@
     --tw-exit-translate-x: initial;
     --tw-exit-translate-y: initial;
   }
+
+  .animate-vertical-pan {
+    animation: verticalPan 10s ease-in-out infinite;
+  }
+}
+
+@keyframes verticalPan {
+  0% {
+    object-position: 50% 0%;
+  }
+  50% {
+    object-position: 50% 100%;
+  }
+  100% {
+    object-position: 50% 0%;
+  }
 }

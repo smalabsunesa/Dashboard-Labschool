@@ -47,10 +47,19 @@ const pilarUnggulan = [
 ];
 
 import { useQuery } from '@tanstack/react-query';
-import { fetchSettings } from '../../lib/api';
+import { fetchSettings, fetchFaculty } from '../../lib/api';
 
 export default function AboutSection() {
   const { data: settings = {} } = useQuery({ queryKey: ['settings'], queryFn: fetchSettings });
+  const { data: facultyMembers = [] } = useQuery({ queryKey: ['faculty'], queryFn: fetchFaculty });
+
+  const principalTeacher = facultyMembers.find(
+    (f) => f.role && f.role.toLowerCase().includes('kepala sekolah')
+  );
+
+  const principalPhoto = principalTeacher?.image_url || '/about-us-2.png';
+  const principalName = principalTeacher?.name || settings.principal_name || 'Kepala Sekolah';
+
   return (
     <SectionWrapper id="about" title="About Us">
       <div className="space-y-16">
@@ -106,8 +115,8 @@ export default function AboutSection() {
             {/* Further Enlarged Centered Floating Offset Principal Photo Badge */}
             <div className="absolute -top-16 sm:-top-18 left-1/2 -translate-x-1/2 w-32 h-32 sm:w-36 sm:h-36 rounded-full bg-white p-1 border-4 border-slate-100 shadow-2xl overflow-hidden shrink-0">
               <ImageWithSkeleton
-                src="/about-us-2.png"
-                alt="Kepala Sekolah SMA Labschool UNESA 1"
+                src={principalPhoto}
+                alt={principalName}
                 className="w-full h-full"
                 imageClassName="object-cover w-full h-full rounded-full"
                 fallbackClassName="bg-slate-200"
@@ -124,7 +133,7 @@ export default function AboutSection() {
                 Sambutan Kepala Sekolah
               </h3>
               <p className="text-xs text-blue-600 font-semibold mt-1 mb-4">
-                {settings.principal_name || 'Kepala Sekolah'}
+                {principalName}
               </p>
 
               {/* Principal Quote Box */}
