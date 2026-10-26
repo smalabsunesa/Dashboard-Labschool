@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Instagram, Globe, GraduationCap, Mail, ArrowUpRight, ExternalLink } from 'lucide-react';
+import { Phone, Instagram, Youtube, GraduationCap, Mail, ArrowUpRight, ExternalLink } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSettings } from '../lib/api';
 
@@ -55,15 +55,15 @@ export default function Footer() {
       ctaText: 'Kunjungi Instagram',
     },
     {
-      id: 'website',
-      title: 'Website Resmi',
-      value: settings.contact_website_url ? settings.contact_website_url.replace(/^https?:\/\//, '') : 'smalabschoolunesa1.sch.id',
-      href: settings.contact_website_url || 'https://smalabschoolunesa1.sch.id',
-      description: 'Portal informasi resmi SMA Labschool UNESA 1',
-      icon: Globe,
-      iconBg: 'bg-blue-600 text-white',
-      hoverBorder: 'hover:border-blue-400 hover:shadow-blue-500/10',
-      ctaText: 'Buka Website',
+      id: 'youtube',
+      title: 'YouTube Official',
+      value: '@smalabschoolunesa',
+      href: settings.contact_youtube_url || 'https://youtube.com/@smalabschoolunesa?si=PYjRCOl00B_9gM-L',
+      description: 'Saluran resmi video kegiatan & keunggulan sekolah',
+      icon: Youtube,
+      iconBg: 'bg-red-600 text-white',
+      hoverBorder: 'hover:border-red-400 hover:shadow-red-500/10',
+      ctaText: 'Tonton YouTube',
     },
     {
       id: 'ppdb',

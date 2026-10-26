@@ -313,6 +313,7 @@ export async function fetchSettings() {
     contact_instagram_url: 'https://instagram.com/smalabschoolunesa.official',
     contact_email: 'smalabschoolunesa@gmail.com',
     contact_website_url: 'https://smalabschoolunesa1.sch.id',
+    contact_youtube_url: 'https://youtube.com/@smalabschoolunesa?si=PYjRCOl00B_9gM-L',
     contact_tiktok_url: 'https://tiktok.com/@smalabschoolunesa',
   };
 
