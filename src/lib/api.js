@@ -38,41 +38,52 @@ const FALLBACK_NEWS = [
     publishedAt: 'AUG 28, 2026',
     imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1200&auto=format&fit=crop',
     imageAlt: 'PPDB SMA Labschool Unesa',
-    tag: 'SPMB & BEASISWA',
     isSpotlight: true,
+    postType: 'forever',
+    deadlineAt: null,
+    mediaType: 'image',
   },
   {
     id: 'update-2',
-    title: 'Prestasi Gemilang Siswa di Olimpiade Sains Nasional 2026',
-    caption: 'Selamat kepada tim sains SMA Labschool Unesa 1 yang berhasil memboyong medali emas dalam OSN 2026 bidang Fisika dan Informatika.',
-    hashtags: '#OSN2026 #SiswaBerprestasi #LabschoolJuara #GenerasiEmas',
-    publishedAt: 'AUG 20, 2026',
-    imageUrl: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop',
-    imageAlt: 'Siswa Berprestasi OSN',
-    tag: 'PRESTASI JUARA',
+    title: 'Pendaftaran Beasiswa Prestasi Unggulan & Talenta Emas 2026',
+    caption: 'Segera kirimkan berkas portofolio prestasi akademik maupun non-akademik sebelum kuota pendaftaran gelombang khusus ditutup.',
+    hashtags: '#BeasiswaTalenta #LabschoolJuara #DeadlinePendaftaran',
+    publishedAt: 'OCT 20, 2026',
+    imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1200&auto=format&fit=crop',
+    imageAlt: 'Beasiswa Prestasi Unggulan',
     isSpotlight: true,
+    postType: 'deadline',
+    // Set 15 days in the future for active demonstration
+    deadlineAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
+    mediaType: 'image',
   },
   {
     id: 'update-3',
-    title: 'Peresmian Smart Digital Hub & Laboratorium AI Robotik',
-    caption: 'SMA Labschool UNESA 1 resmi meluncurkan fasilitas pembelajaran kecerdasan buatan (AI) dan robotika canggih untuk mendukung Kurikulum Merdeka.',
-    hashtags: '#DigitalLearning #Robotik #AIinEducation #InnovateWithLabschool',
-    publishedAt: 'SEP 10, 2026',
-    imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop',
-    imageAlt: 'Laboratorium Digital Hub',
-    tag: 'INNOVATION HUB',
+    title: 'Keseruan Siswa di Labschool Science & Art Festival 2026',
+    caption: 'Tonton recap cuplikan kemeriahan Science & Art Festival yang diunggah di Instagram resmi @smalabschoolunesa.official!',
+    hashtags: '#LabschoolFestival #ReelsInstagram #SiswaKreatif',
+    publishedAt: 'OCT 12, 2026',
+    imageUrl: 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1200&auto=format&fit=crop',
+    imageAlt: 'Science & Art Festival',
     isSpotlight: true,
+    postType: 'forever',
+    deadlineAt: null,
+    mediaType: 'instagram',
+    instagramUrl: 'https://www.instagram.com/p/DAc7wS9yABC/',
   },
   {
     id: 'update-4',
-    title: 'Program Cultural Exchange Sister School Australia',
-    caption: 'Delegasi siswa SMA Labschool UNESA 1 berpartisipasi dalam program pertukaran budaya dan pembelajaran global bersama sekolah mitra di Melbourne.',
-    hashtags: '#SisterSchool #GlobalExchange #InternationalProgram',
-    publishedAt: 'SEP 18, 2026',
-    imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1200&auto=format&fit=crop',
-    imageAlt: 'Pertukaran Pelajar Australia',
-    tag: 'GLOBAL EXPERIENCE',
+    title: 'Tur Virtual Smart Digital Hub & Laboratorium Robotik AI',
+    caption: 'Saksikan video dokumentasi fasilitas canggih smart digital hub untuk menunjang riset robotika & kurikulum merdeka.',
+    hashtags: '#VideoTour #RoboticLab #LabschoolModern #DigitalLearning',
+    publishedAt: 'SEP 28, 2026',
+    imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200&auto=format&fit=crop',
+    imageAlt: 'Virtual Tour Robotik',
     isSpotlight: false,
+    postType: 'forever',
+    deadlineAt: null,
+    mediaType: 'video',
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
   },
 ];
 
@@ -147,7 +158,28 @@ export async function fetchFaqs(signal) {
   return FALLBACK_FAQS;
 }
 
+/**
+ * Permanently deletes expired deadline posts from Supabase database
+ */
+export async function deleteExpiredNews() {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const nowIso = new Date().toISOString();
+      await supabase
+        .from('smal_updates')
+        .delete()
+        .eq('post_type', 'deadline')
+        .lte('deadline_at', nowIso);
+    } catch (err) {
+      console.warn('Auto-delete expired news from database failed:', err);
+    }
+  }
+}
+
 export async function fetchNews(signal) {
+  // Permanently delete any expired deadline news from the database first
+  await deleteExpiredNews();
+
   // Option 1: Supabase Integration
   if (isSupabaseConfigured && supabase) {
     try {
@@ -163,8 +195,14 @@ export async function fetchNews(signal) {
           caption: entry.caption?.trim() || '',
           hashtags: entry.hashtags?.trim() || '',
           publishedAt: entry.published_at || formatPublishedDate(entry.created_at),
-          imageUrl: entry.image_url || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop',
+          imageUrl: entry.image_url || entry.media_url || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop',
           imageAlt: entry.image_alt || entry.title || 'School news update',
+          isSpotlight: Boolean(entry.is_spotlight),
+          postType: entry.post_type || 'forever',
+          deadlineAt: entry.deadline_at || null,
+          mediaType: entry.media_type || (entry.instagram_url ? 'instagram' : entry.video_url ? 'video' : 'image'),
+          videoUrl: entry.video_url || '',
+          instagramUrl: entry.instagram_url || '',
         }));
       }
     } catch (err) {

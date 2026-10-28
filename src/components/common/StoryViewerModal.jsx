@@ -1,16 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, ChevronLeft, ChevronRight, Pause, Play, Send, ExternalLink } from 'lucide-react';
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Pause,
+  Play,
+  Send,
+  ExternalLink,
+  Instagram,
+  Video,
+  Volume2,
+  VolumeX,
+  Clock,
+  Infinity as InfinityIcon,
+} from 'lucide-react';
 import ImageWithSkeleton from './ImageWithSkeleton';
+import { resolveMediaInfo, getDeadlineInfo } from '../../lib/media';
 
-const STORY_DURATION = 5000; // 5 seconds per story
+const STORY_DURATION = 6500; // 6.5 seconds per story
 
 export default function StoryViewerModal({ isOpen, stories = [], initialIndex = 0, onClose }) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+
   const animationFrameRef = useRef(null);
   const startTimeRef = useRef(null);
   const pausedTimeRef = useRef(0);
+  const videoRef = useRef(null);
 
   // Sync index when initialIndex changes or modal opens
   useEffect(() => {
@@ -22,9 +40,27 @@ export default function StoryViewerModal({ isOpen, stories = [], initialIndex = 
     }
   }, [isOpen, initialIndex]);
 
-  // Handle auto-progress timer
+  const currentStory = stories[currentIndex] || stories[0];
+  const media = resolveMediaInfo(currentStory);
+  const deadline = getDeadlineInfo(
+    currentStory?.deadlineAt || currentStory?.deadline_at,
+    currentStory?.postType || currentStory?.post_type
+  );
+
+  // Synchronize HTML5 video play/pause
   useEffect(() => {
-    if (!isOpen || stories.length === 0 || isPaused) {
+    if (videoRef.current && media.type === 'video' && !media.isDriveVideo) {
+      if (isPaused) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play().catch(() => {});
+      }
+    }
+  }, [isPaused, media.type, media.isDriveVideo]);
+
+  // Handle auto-progress timer (Instagram embeds pause auto-progress so users can interact)
+  useEffect(() => {
+    if (!isOpen || stories.length === 0 || isPaused || media.type === 'instagram') {
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
       return;
     }
@@ -56,7 +92,7 @@ export default function StoryViewerModal({ isOpen, stories = [], initialIndex = 
     return () => {
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [isOpen, currentIndex, isPaused, stories.length, onClose]);
+  }, [isOpen, currentIndex, isPaused, stories.length, onClose, media.type]);
 
   // Keyboard navigation & body scroll lock
   useEffect(() => {
@@ -66,6 +102,10 @@ export default function StoryViewerModal({ isOpen, stories = [], initialIndex = 
       if (e.key === 'Escape') onClose();
       if (e.key === 'ArrowRight') handleNext();
       if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === ' ') {
+        e.preventDefault();
+        setIsPaused((p) => !p);
+      }
     };
 
     document.body.style.overflow = 'hidden';
@@ -107,8 +147,6 @@ export default function StoryViewerModal({ isOpen, stories = [], initialIndex = 
 
   if (!isOpen || !stories || stories.length === 0) return null;
 
-  const currentStory = stories[currentIndex] || stories[0];
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md select-none animate-fadeIn">
       {/* Desktop Previous Button */}
@@ -132,23 +170,67 @@ export default function StoryViewerModal({ isOpen, stories = [], initialIndex = 
 
       {/* Main WhatsApp/Instagram Story Screen Frame */}
       <div
-        className="relative w-full h-full md:h-[90vh] md:max-w-[420px] md:rounded-3xl overflow-hidden bg-slate-950 flex flex-col justify-between shadow-2xl border border-white/10"
+        className="relative w-full h-full md:h-[92vh] md:max-w-[430px] md:rounded-[2.5rem] overflow-hidden bg-slate-950 flex flex-col justify-between shadow-2xl border border-white/10"
         onMouseDown={() => setIsPaused(true)}
         onMouseUp={() => setIsPaused(false)}
         onTouchStart={() => setIsPaused(true)}
         onTouchEnd={() => setIsPaused(false)}
       >
-        {/* Story Background Image */}
-        <div className="absolute inset-0 z-0">
-          <ImageWithSkeleton
-            src={currentStory.imageUrl}
-            alt={currentStory.title}
-            className="w-full h-full"
-            imageClassName="object-cover w-full h-full animate-pulse-slow"
-            fallbackClassName="bg-slate-900"
-          />
+        {/* Story Background / Media Player */}
+        <div className="absolute inset-0 z-0 bg-slate-950 flex items-center justify-center overflow-hidden">
+          {media.type === 'instagram' ? (
+            <div className="w-full h-full flex flex-col bg-slate-900 overflow-y-auto pt-16 pb-28">
+              <iframe
+                src={media.embedUrl}
+                className="w-full flex-1 border-0 min-h-[460px] bg-white rounded-xl"
+                title={currentStory.title}
+                allowTransparency="true"
+                allowFullScreen
+                scrolling="yes"
+              />
+            </div>
+          ) : media.type === 'youtube' ? (
+            <div className="w-full h-full flex items-center justify-center bg-black">
+              <iframe
+                src={media.embedUrl}
+                className="w-full h-full border-0"
+                title={currentStory.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          ) : media.type === 'video' && media.isDriveVideo ? (
+            <div className="w-full h-full flex items-center justify-center bg-black">
+              <iframe
+                src={media.embedUrl}
+                className="w-full h-full border-0"
+                title={currentStory.title}
+                allow="autoplay"
+                allowFullScreen
+              />
+            </div>
+          ) : media.type === 'video' ? (
+            <video
+              ref={videoRef}
+              src={media.url}
+              className="w-full h-full object-cover"
+              autoPlay
+              playsInline
+              loop
+              muted={isMuted}
+            />
+          ) : (
+            <ImageWithSkeleton
+              src={media.url}
+              alt={currentStory.title}
+              className="w-full h-full"
+              imageClassName="object-cover w-full h-full animate-pulse-slow"
+              fallbackClassName="bg-slate-900"
+            />
+          )}
+
           {/* Top & Bottom Gradient Overlays for High Contrast Text */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/90 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/95 pointer-events-none" />
         </div>
 
         {/* Story Header: Segmented Progress Bars + Profile Info */}
@@ -158,7 +240,7 @@ export default function StoryViewerModal({ isOpen, stories = [], initialIndex = 
             {stories.map((story, idx) => {
               let fillPercentage = 0;
               if (idx < currentIndex) fillPercentage = 100;
-              else if (idx === currentIndex) fillPercentage = progress;
+              else if (idx === currentIndex) fillPercentage = media.type === 'instagram' ? 100 : progress;
               else fillPercentage = 0;
 
               return (
@@ -175,7 +257,7 @@ export default function StoryViewerModal({ isOpen, stories = [], initialIndex = 
           {/* Profile Header Bar */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full p-[2px] bg-gradient-to-tr from-amber-500 via-orange-500 to-blue-500 shadow-md">
+              <div className="w-10 h-10 rounded-full p-[2px] bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 shadow-md">
                 <img
                   src="/Labschool-UNESA-logo.svg"
                   alt="Labschool Logo"
@@ -183,26 +265,39 @@ export default function StoryViewerModal({ isOpen, stories = [], initialIndex = 
                 />
               </div>
               <div>
-                <p className="text-sm font-bold text-white leading-none">smalabschoolunesa.official</p>
-                <p className="text-[0.7rem] text-slate-300 mt-0.5">{currentStory.publishedAt || 'Terbaru'}</p>
+                <p className="text-sm font-bold text-white leading-none flex items-center gap-1.5">
+                  smalabschoolunesa.official
+                  {media.type === 'instagram' && (
+                    <Instagram size={13} className="text-pink-400 inline" />
+                  )}
+                </p>
               </div>
             </div>
 
             {/* Header Action Controls */}
             <div className="flex items-center gap-2">
+              {media.type === 'video' && !media.isDriveVideo && (
+                <button
+                  onClick={() => setIsMuted((p) => !p)}
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
+                  className="p-1.5 rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
+                >
+                  {isMuted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+                </button>
+              )}
               <button
                 onClick={togglePause}
                 aria-label={isPaused ? 'Play' : 'Pause'}
                 className="p-1.5 rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
               >
-                {isPaused ? <Play size={18} /> : <Pause size={18} />}
+                {isPaused ? <Play size={17} /> : <Pause size={17} />}
               </button>
               <button
                 onClick={onClose}
                 aria-label="Close Story"
                 className="p-1.5 rounded-full bg-black/40 text-white hover:bg-black/60 transition-colors"
               >
-                <X size={20} />
+                <X size={19} />
               </button>
             </div>
           </div>
@@ -213,22 +308,33 @@ export default function StoryViewerModal({ isOpen, stories = [], initialIndex = 
           <div
             className="w-1/3 h-full cursor-pointer"
             onClick={handlePrev}
-            title="Previous Story"
+            title="Sebelumnya"
           />
           <div
             className="w-2/3 h-full cursor-pointer"
             onClick={handleNext}
-            title="Next Story"
+            title="Berikutnya"
           />
         </div>
 
         {/* Story Footer Content: Title, Caption, Hashtags & Action CTA */}
         <div className="relative z-20 p-5 pb-6 space-y-3 text-white">
-          {currentStory.tag && (
-            <span className="inline-block px-3 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-white bg-orange-500 rounded-full shadow-md">
-              {currentStory.tag}
-            </span>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Instagram Link Badge */}
+            {media.type === 'instagram' && (
+              <a
+                href={media.originalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-[0.65rem] font-bold tracking-wider text-white bg-gradient-to-r from-pink-500 to-purple-600 rounded-full shadow-md hover:opacity-90"
+              >
+                <Instagram size={11} />
+                Buka di Instagram
+                <ExternalLink size={10} />
+              </a>
+            )}
+          </div>
 
           <h3 className="text-xl font-bold text-white drop-shadow-md leading-tight">
             {currentStory.title}

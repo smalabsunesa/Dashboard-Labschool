@@ -17,11 +17,28 @@ CREATE TABLE IF NOT EXISTS public.smal_updates (
   title TEXT NOT NULL,
   caption TEXT,
   hashtags TEXT,
+  tag TEXT DEFAULT 'BERITA',
   published_at TEXT,
   image_url TEXT,
   image_alt TEXT,
+  is_spotlight BOOLEAN DEFAULT false,
+  post_type TEXT DEFAULT 'forever', -- 'forever' (Berita Selamanya) or 'deadline' (Berita Batas Waktu)
+  deadline_at TIMESTAMP WITH TIME ZONE, -- Expiration date/time for deadline posts
+  media_type TEXT DEFAULT 'image', -- 'image', 'video', 'instagram', 'youtube'
+  video_url TEXT, -- Direct video URL or YouTube/Drive video link
+  instagram_url TEXT, -- Instagram post / reel URL to repost
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Migration for existing smal_updates tables:
+ALTER TABLE public.smal_updates 
+  ADD COLUMN IF NOT EXISTS tag TEXT DEFAULT 'BERITA',
+  ADD COLUMN IF NOT EXISTS is_spotlight BOOLEAN DEFAULT false,
+  ADD COLUMN IF NOT EXISTS post_type TEXT DEFAULT 'forever',
+  ADD COLUMN IF NOT EXISTS deadline_at TIMESTAMP WITH TIME ZONE,
+  ADD COLUMN IF NOT EXISTS media_type TEXT DEFAULT 'image',
+  ADD COLUMN IF NOT EXISTS video_url TEXT,
+  ADD COLUMN IF NOT EXISTS instagram_url TEXT;
 
 -- 3. Create Inquiries / Contact Form Table
 CREATE TABLE IF NOT EXISTS public.smal_inquiries (
@@ -41,14 +58,16 @@ ALTER TABLE public.smal_faqs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.smal_updates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.smal_inquiries ENABLE ROW LEVEL SECURITY;
 
--- Allow Public Read Access for FAQs and News Updates
+-- Allow Public Read Access for FAQs
 DROP POLICY IF EXISTS "Allow public read access for faqs" ON public.smal_faqs;
 CREATE POLICY "Allow public read access for faqs" ON public.smal_faqs
   FOR SELECT USING (true);
 
+-- Allow Full CRUD Access for News Updates (Read, Insert, Update, Delete Expired)
 DROP POLICY IF EXISTS "Allow public read access for updates" ON public.smal_updates;
-CREATE POLICY "Allow public read access for updates" ON public.smal_updates
-  FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Allow public write access for updates" ON public.smal_updates;
+CREATE POLICY "Allow public full access for updates" ON public.smal_updates
+  FOR ALL USING (true) WITH CHECK (true);
 
 -- Allow Public Insert Access for Inquiries (Contact Form Submissions)
 DROP POLICY IF EXISTS "Allow public insert access for inquiries" ON public.smal_inquiries;
