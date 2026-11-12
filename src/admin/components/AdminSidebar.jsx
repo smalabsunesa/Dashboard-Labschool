@@ -2,11 +2,12 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Newspaper, HelpCircle, MessageSquare, ChevronLeft, ChevronRight, School,
-  Users, Activity, Trophy, Settings
+  Users, Activity, Trophy, Settings, Sparkles
 } from 'lucide-react';
 
 const navItems = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/admin/programs', label: 'Program Unggulan', icon: Sparkles },
   { to: '/admin/news', label: 'Berita', icon: Newspaper },
   { to: '/admin/faqs', label: 'FAQ', icon: HelpCircle },
   { to: '/admin/inquiries', label: 'Pesan Masuk', icon: MessageSquare },

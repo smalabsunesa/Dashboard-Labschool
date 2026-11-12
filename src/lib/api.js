@@ -247,40 +247,426 @@ export async function createInquiry(payload) {
   return { success: true, message: 'Inquiry received in demo mode.' };
 }
 
+// Built-in 5 Featured Programs Fallback Data
+export const FALLBACK_PROGRAMS = [
+  {
+    id: 'prog-1',
+    slug: 'sks',
+    title: 'Sistem Kredit Semester (SKS)',
+    badge_text: 'Kurikulum Fleksibel & Akseleratif',
+    description: 'Sistem pembelajaran adaptif yang memungkinkan siswa cerdas istimewa menyelesaikan masa studi dalam 4-5 semester (2 tahun) atau 6 semester (3 tahun reguler), sesuai bakat dan kecepatan belajar mandiri.',
+    full_content: `Program Sistem Kredit Semester (SKS) di SMA Labschool UNESA 1 dirancang khusus untuk mengakomodasi keberagaman ritme belajar setiap siswa. Melalui kurikulum berbasis unit kegiatan belajar mandiri (UKBM), peserta didik yang memiliki kecepatan belajar tinggi dapat mengambil beban studi lebih cepat tanpa mengabaikan pemahaman konsep.\n\nSiswa didampingi oleh Guru Pembimbing Akademik (GPA) berpengalaman yang memetakan perkembangan kompetensi secara berkala. Siswa tidak perlu khawatir terbebani karena sistem penugasan dan evaluasi bersifat personal sesuai kapasitas masing-masing siswa.`,
+    image_url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1200',
+    circle_bg: 'bg-[#002B66]',
+    moments: [],
+  },
+  {
+    id: 'prog-2',
+    slug: 'bahasa',
+    title: 'Sekolah 5 Bahasa & Pre-University',
+    badge_text: 'Komunikasi Global & Jalur Kuliah Bahasa',
+    description: 'Penguasaan 5 bahasa strategis (Indonesia, Inggris, Jepang, Mandarin, Arab) yang terintegrasi dengan bimbingan persiapan masuk PTN & Beasiswa Luar Negeri untuk rumpun ilmu bahasa dan humaniora.',
+    full_content: `Program Sekolah 5 Bahasa dan Pre-University Class dipadukan secara terpadu di SMA Labschool UNESA 1. Karena jalur kuliah dan karier global bidang bahasa memerlukan persiapan yang matang, kurikulum kami memfasilitasi penguasaan bahasa secara bertahap lengkap dengan sertifikasi resmi internasional (TOEFL, JLPT, HSK).\n\nSiswa dibimbing memilih bahasa peminatan, dilatih langsung oleh pengajar berpengalaman dan penutur asli (native speaker), serta mendapatkan pendampingan portofolio dan wawancara untuk tembus perguruan tinggi impian.`,
+    image_url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=1200',
+    circle_bg: 'bg-[#F59E0B]',
+    available_languages: [
+      { name: 'Bahasa Inggris', level: 'EAP, TOEFL & IELTS Preparation', target: 'Skor TOEFL 550+ / IELTS 6.5+', desc: 'Fokus pada academic writing, presentasi ilmiah, debate, dan persiapan kuliah luar negeri.' },
+      { name: 'Bahasa Jepang', level: 'JLPT N5 - N3 & Budaya Jepang', target: 'Sertifikasi Resmi JLPT N4/N3', desc: 'Penguasaan huruf Hiragana, Katakana, Kanji, tata bahasa, dan persiapan beasiswa studi ke Jepang.' },
+      { name: 'Bahasa Mandarin', level: 'HSK Level 1 - 4 & Percakapan', target: 'Sertifikasi Resmi HSK 3 - 4', desc: 'Percakapan praktis, penulisan Hanzi, etika bisnis Tionghoa, dan peluang beasiswa di Taiwan/Tiongkok.' },
+      { name: 'Bahasa Arab', level: 'Komunikasi Fusha & Kaidah Linguistik', target: 'Kecakapan Berbicara & Literasi', desc: 'Pemahaman kaidah bahasa Arab komunikatif modern dan persiapan studi Timur Tengah.' },
+      { name: 'Bahasa Indonesia', level: 'Jurnalistik, Riset & Karya Sastra', target: 'Penulisan Kritis & Lomba Debat', desc: 'Pengasahan retorika pidato, esai ilmiah seleksi SNBP PTN, dan apresiasi karya sastra tingkat lanjut.' },
+    ],
+    ongoing_programs: [
+      { title: 'Kelas Intensif Sertifikasi Bahasa Resmi (TOEFL / JLPT / HSK)', status: 'Berjalan Setiap Semester', desc: 'Bimbingan terstruktur bersama lembaga sertifikasi terakreditasi sehingga setiap siswa mengantongi sertifikat bahasa internasional sebelum kelulusan.' },
+      { title: 'Pre-University Pathway: Bimbingan Jurusan Bahasa & Hubungan Internasional', status: 'Aktif Sepanjang Tahun', desc: 'Bimbingan khusus pemetaan program studi sastra, linguistik, hubungan internasional, komunikasi, dan diplomasi di PTN favorit serta kampus luar negeri.' },
+      { title: 'Language Immersion Camp & Native Speaker Days', status: 'Agenda Semesteran', desc: 'Kemah pembelajaran bahasa selama 3 hari dengan aturan 100% berbahasa asing, didampingi oleh relawan dan akademisi penutur asli.' },
+      { title: 'Model United Nations & Global Debate Society', status: 'Klub Mingguan', desc: 'Simulasi sidang diplomasi PBB berbahasa Inggris guna melatih kemampuan negosiasi, riset isu geopolitik dunia, dan pemecahan masalah global.' },
+    ],
+    moments: [
+      { url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=800', caption: 'Pentas budaya dan pidato multi-bahasa siswa' },
+      { url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=800', caption: 'Workshop interaktif bersama penutur asli (Native Speaker)' },
+      { url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800', caption: 'Simulasi konferensi internasional Model UN berbahasa asing' },
+    ],
+  },
+  {
+    id: 'prog-3',
+    slug: 'digital',
+    title: 'Digital Learning & AI Hub',
+    badge_text: 'Fasilitas Modern & Kurikulum AI',
+    description: 'Ekosistem belajar modern terintegrasi platform digital, Smart Classroom, Lab Robotika, Coding, IoT, serta literasi pemanfaatan Artificial Intelligence (AI) secara etis dan kreatif.',
+    full_content: `Mempersiapkan generasi masa depan di era digital, sekolah menyediakan sarana Smart Classroom interaktif, Laboratorium Robotika & AI, serta sistem Learning Management System (LMS) modern. Siswa diajarkan dasar-dasar computational thinking, algoritma pemrograman, dan etika kecerdasan buatan.\n\nSiswa aktif menciptakan berbagai proyek berbasis teknologi, mulai dari sistem automasi sekolah, robot pendeteksi bencana, hingga aplikasi ramah lingkungan yang berhasil meraih medali di tingkat nasional.`,
+    image_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=1200',
+    circle_bg: 'bg-[#002B66]',
+    moments: [
+      { url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=800', caption: 'Praktikum perakitan robotik dan sensor IoT di Laboratorium' },
+      { url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800', caption: 'Pembelajaran interaktif menggunakan panel layar sentuh digital' },
+    ],
+  },
+  {
+    id: 'prog-4',
+    slug: 'international',
+    title: 'International Program & Sister School',
+    badge_text: 'Wawasan Global & Kemitraan Internasional',
+    description: 'Kemitraan Sister School dengan institusi pendidikan di Australia & Asia, mencakup pertukaran pelajar, proyek riset bersama, dan partisipasi delegasi pemuda dunia.',
+    latest_activity: {
+      title: 'Study Excursion & Cultural Exchange Sister School ke Tokyo & Kyoto High School',
+      date: 'Oktober 2026',
+      description: 'Sebanyak 25 delegasi siswa Labschool telah sukses menyelesaikan program pertukaran budaya, riset sains laboratorium, dan homestay bersama sekolah mitra di Jepang.',
+      image_url: 'https://images.unsplash.com/photo-1542013861-12a843e9900c?q=80&w=800',
+    },
+    completed_programs: [
+      {
+        title: 'Study Excursion & Pertukaran Budaya di Kyoto High School',
+        year: 'Oktober 2026',
+        destination: 'Kyoto, Jepang',
+        description: 'Kunjungan akademik delegasi siswa Labschool meliputi kolaborasi kelas bersama, kunjungan ke laboratorium antariksa Miraikan, dan homestay di Kyoto.',
+        image_url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800',
+      },
+      {
+        title: 'Sakura Science High School Exchange Program di Tokyo University of Science',
+        year: 'Mei 2025',
+        destination: 'Tokyo, Jepang',
+        description: 'Partisipasi riset sains eksperimental siswa dalam bidang nanoteknologi dan robotika bersama ilmuwan Jepang.',
+        image_url: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=800',
+      },
+      {
+        title: 'Sister School Student Exchange di Melbourne High School',
+        year: 'November 2025',
+        destination: 'Melbourne, Australia',
+        description: 'Program pertukaran siswa selama 14 hari, mencakup pemahaman multikultural, kurikulum STEM Australia, dan pameran seni budaya Nusantara.',
+        image_url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=800',
+      },
+      {
+        title: 'Asia-Pacific Young Leaders Summit di National University of Singapore',
+        year: 'September 2024',
+        destination: 'Singapura',
+        description: 'Konferensi kepemimpinan pemuda membahas tantangan perubahan iklim global, delegasi Labschool berhasil meraih penghargaan delegasi terbaik.',
+        image_url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800',
+      },
+      {
+        title: 'Global Classroom Online Collaborative Learning with Osaka High School',
+        year: 'Maret 2024',
+        destination: 'Online / Hybrid',
+        description: 'Pembelajaran sains dan kebudayaan kolaboratif daring secara berkala antara siswa SMA Labschool UNESA 1 dan mitra sekolah di Osaka.',
+        image_url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800',
+      },
+    ],
+    full_content: `International Program menghubungkan siswa SMA Labschool UNESA 1 dengan dunia internasional secara nyata. Melalui program kerja sama Sister School di Australia, Jepang, dan Asia Tenggara, delegasi siswa berkesempatan mengikuti program pertukaran pelajar (Student Exchange), homestay, dan *joint classroom project*.\n\nPengalaman ini membuka cakrawala global, melatih kepemimpinan, dan membangun jejaring persahabatan internasional sejak bangku sekolah menengah atas.`,
+    image_url: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1200',
+    circle_bg: 'bg-[#002B66]',
+    moments: [
+      { url: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=800', caption: 'Kunjungan delegasi siswa ke kampus mitra di Australia' },
+      { url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800', caption: 'Kolaborasi riset budaya dan presentasi bersama siswa internasional' },
+      { url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800', caption: 'Penerimaan kunjungan balasan sekolah mitra luar negeri' },
+    ],
+  },
+  {
+    id: 'prog-5',
+    slug: 'preuni',
+    title: 'Pre-University Class (Jalur Bahasa & PTN)',
+    badge_text: 'Sukses PTN & Kuliah Bahasa',
+    description: 'Bimbingan intensif persiapan tembus PTN favorit dan beasiswa luar negeri, terkhusus bagi peminat jurusan bahasa, diplomasi, sastra, dan humaniora.',
+    full_content: `Pre-University Class di SMA Labschool UNESA 1 berfokus pada kelas bahasa dan rumpun ilmu humaniora internasional, mengantarkan siswa masuk ke PTN favorit dan beasiswa luar negeri impian.`,
+    image_url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1200',
+    circle_bg: 'bg-[#F59E0B]',
+    moments: [],
+  },
+];
+
+export async function fetchPrograms() {
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase.from('smal_programs').select('*').order('order_index', { ascending: true });
+      if (!error && data && data.length > 0) {
+        return data.map((item) => ({
+          ...item,
+          moments: Array.isArray(item.moments) ? item.moments : typeof item.moments === 'string' ? JSON.parse(item.moments || '[]') : [],
+        }));
+      }
+    } catch (e) {
+      console.warn('Supabase fetchPrograms fallback:', e);
+    }
+  }
+  return FALLBACK_PROGRAMS;
+}
+
 export async function fetchFaculty() {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase.from('smal_faculty').select('*').order('id', { ascending: true });
-    if (!error && data) return data;
+    try {
+      const { data, error } = await supabase.from('smal_faculty').select('*').order('id', { ascending: true });
+      if (!error && data && data.length > 0) {
+        return data.map(item => ({
+          ...item,
+          moments: Array.isArray(item.moments) ? item.moments : typeof item.moments === 'string' ? JSON.parse(item.moments || '[]') : [],
+        }));
+      }
+    } catch (e) {
+      console.warn('Supabase fetchFaculty fallback:', e);
+    }
   }
   return [
-    { id: 'fac-1', name: 'Dr. Budi Santoso', role: 'Kepala Sekolah', subject: 'Manajemen Pendidikan', image_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400' },
-    { id: 'fac-2', name: 'Siti Aminah, M.Pd', role: 'Wakil Kepala Sekolah', subject: 'Biologi', image_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400' },
-    { id: 'fac-3', name: 'Ahmad Faisal, S.T', role: 'Guru Penggerak', subject: 'Koding & AI', image_url: 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=400' },
+    {
+      id: 'fac-1',
+      name: 'Dr. Budi Santoso, M.Pd.',
+      role: 'Kepala Sekolah',
+      subject: 'Manajemen Pendidikan & Kepemimpinan',
+      education_history: 'S1 Pendidikan Universitas Negeri Surabaya (UNESA)\nS2 Manajemen Pendidikan Universitas Negeri Malang (UM)\nS3 Kebijakan Pendidikan Universitas Pendidikan Indonesia (UPI)',
+      bio: 'Berdedikasi lebih dari 20 tahun dalam transformasi pendidikan berkarakter dan inovasi kurikulum digital di Indonesia.',
+      teaching_principles: '• Mendidik dengan keteladanan watak & budi pekerti luhur.\n• Mengintegrasikan inovasi teknologi mutakhir dengan nilai-nilai luhur kebangsaan.\n• Membimbing setiap siswa mengenali dan mengembangkan potensi kepemimpinan terbaiknya.',
+      image_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=600',
+      moments: [],
+    },
+    {
+      id: 'fac-2',
+      name: 'Siti Aminah, M.Pd.',
+      role: 'Wakil Kepala Sekolah Bidang Kurikulum',
+      subject: 'Biologi & Sains Terapan',
+      education_history: 'S1 Pendidikan Biologi Universitas Negeri Surabaya (UNESA)\nS2 Magister Pendidikan Sains Universitas Airlangga (UNAIR)',
+      bio: 'Penggerak Kurikulum Merdeka dan pembina tim olimpiade biologi peraih medali emas OSN tingkat nasional.',
+      teaching_principles: '• Belajar sains melalui eksperimen langsung dan penalaran kritis.\n• Memberi ruang aman bagi siswa untuk berani bertanya dan menguji hipotesis baru.\n• Menghargai keberagaman gaya belajar dan mendampingi dengan pendekatan personal.',
+      image_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=600',
+      moments: [],
+    },
+    {
+      id: 'fac-3',
+      name: 'Ahmad Faisal, S.T., M.Kom.',
+      role: 'Koordinator Digital Learning & AI',
+      subject: 'Informatika, Coding & Robotika',
+      education_history: 'S1 Teknik Elektro Institut Teknologi Sepuluh Nopember (ITS)\nS2 Magister Teknik Informatika Institut Teknologi Bandung (ITB)',
+      bio: 'Praktisi teknologi dan mentor kompetisi robotika internasional dengan fokus implementasi AI untuk pendidikan.',
+      teaching_principles: '• Belajar coding adalah belajar memecahkan masalah kehidupan nyata secara sistematis.\n• Mendorong siswa bertransformasi dari konsumen konten menjadi kreator inovasi teknologi.\n• Menanamkan etika digital dan tanggung jawab moral dalam pemanfaatan kecerdasan buatan.',
+      image_url: 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=600',
+      moments: [],
+    },
   ];
 }
 
 export async function fetchActivities() {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase.from('smal_activities').select('*').order('id', { ascending: false });
-    if (!error && data) return data;
+    try {
+      const { data, error } = await supabase.from('smal_activities').select('*').order('id', { ascending: false });
+      if (!error && data && data.length > 0) {
+        return data.map(item => ({
+          ...item,
+          moments: Array.isArray(item.moments) ? item.moments : typeof item.moments === 'string' ? JSON.parse(item.moments || '[]') : [],
+        }));
+      }
+    } catch (e) {
+      console.warn('Supabase fetchActivities fallback:', e);
+    }
   }
   return [
-    { id: 'act-1', title: 'Study Excursion ke Jepang', tag: 'Kunjungan Internasional', event_date: 'Okt 2026', description: 'Kunjungan siswa SKS ke Universitas di Tokyo.', image_url: 'https://images.unsplash.com/photo-1542013861-12a843e9900c?q=80&w=400' },
-    { id: 'act-2', title: 'Kompetisi Debat Nasional', tag: 'Prestasi Akademik', event_date: 'Sep 2026', description: 'Tim debat SMA Labschool meraih juara nasional.', image_url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=400' },
+    {
+      id: 'act-1',
+      title: 'Study Excursion & International Exchange ke Jepang',
+      tag: 'Kunjungan Internasional',
+      event_date: 'Okt 2026',
+      description: 'Program pembelajaran luar negeri dan pertukaran budaya delegasi siswa SMA Labschool UNESA 1 di Tokyo & Kyoto.',
+      full_content: `Sebanyak 25 delegasi siswa SMA Labschool UNESA 1 mengikuti program Study Excursion ke Jepang selama 10 hari. Program ini mencakup kunjungan akademis ke Tokyo University, eksplorasi laboratorium teknologi tinggi Miraikan, serta pertukaran budaya langsung bersama siswa mitra di Kyoto High School.\n\nKegiatan ini mengasah kemandirian, kemampuan komunikasi lintas budaya, dan memperluas wawasan akademis siswa dalam memahami ekosistem sains dunia.`,
+      image_url: 'https://images.unsplash.com/photo-1542013861-12a843e9900c?q=80&w=800',
+      moments: [
+        { url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=800', caption: 'Kunjungan budaya ke situs bersejarah di Kyoto' },
+        { url: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=800', caption: 'Diskusi ilmiah bersama dosen tamu di Tokyo University' },
+        { url: 'https://images.unsplash.com/photo-1528164344705-475426879c0d?q=80&w=800', caption: 'Foto bersama keluarga angkat (homestay program)' },
+      ],
+    },
+    {
+      id: 'act-2',
+      title: 'Prestasi Juara 1 Kompetisi Debat Parlemen Nasional 2026',
+      tag: 'Prestasi Akademik',
+      event_date: 'Sep 2026',
+      description: 'Tim debat SMA Labschool UNESA 1 berhasil memboyong piala bergilir juara pertama kompetisi debat nasional.',
+      full_content: `Tim debat SMA Labschool UNESA 1 kembali menorehkan prestasi gemilang dengan menjuarai Kompetisi Debat Parlemen Nasional 2026 yang diikuti oleh lebih dari 120 sekolah unggulan di seluruh Indonesia.\n\nDengan argumentasi kritis dan data riset yang kuat, perwakilan kami dinobatkan sebagai Best Speaker dan Juara 1 Nasional.`,
+      image_url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=800',
+      moments: [
+        { url: 'https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=800', caption: 'Sesi babak final debat dengan mosi ekonomi digital' },
+        { url: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800', caption: 'Penyerahan piala juara 1 dan sertifikat penghargaan' },
+      ],
+    },
   ];
 }
 
 export async function fetchExtracurriculars() {
   if (isSupabaseConfigured && supabase) {
-    const { data, error } = await supabase.from('smal_extracurriculars').select('*').order('id', { ascending: true });
-    if (!error && data) return data;
+    try {
+      const { data, error } = await supabase.from('smal_extracurriculars').select('*').order('id', { ascending: true });
+      if (!error && data && data.length > 0) {
+        return data.map(item => ({
+          ...item,
+          moments: Array.isArray(item.moments) ? item.moments : typeof item.moments === 'string' ? JSON.parse(item.moments || '[]') : [],
+          achievements: Array.isArray(item.achievements) ? item.achievements : typeof item.achievements === 'string' ? JSON.parse(item.achievements || '[]') : [],
+        }));
+      }
+    } catch (e) {
+      console.warn('Supabase fetchExtracurriculars fallback:', e);
+    }
   }
   return [
-    { id: 'ex-1', name: 'Pramuka', category: 'Wajib', description: 'Ekstrakurikuler wajib untuk seluruh binaan sekolah.', image_url: 'https://images.unsplash.com/photo-1576135245831-7bcab06b4ff0?q=80&w=400' },
-    { id: 'ex-2', name: 'Tari', category: 'Seni', description: 'Mengembangkan bakat seni tari tradisional dan modern.', image_url: 'https://images.unsplash.com/photo-1508700922718-d4567acfa2d0?q=80&w=400' },
-    { id: 'ex-3', name: 'Basket', category: 'Olahraga', description: 'Tim bola basket kebanggaan SMA Labschool.', image_url: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=400' },
-    { id: 'ex-4', name: 'Robotika', category: 'Teknologi', description: 'Eksplorasi pembuatan robot dan IoT.', image_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=400' },
+    {
+      id: 'ex-1',
+      name: 'Pramuka Garuda Labschool',
+      category: 'Kepemimpinan & Wajib',
+      description: 'Ekstrakurikuler pembinaan karakter disiplin, kemandirian, dan kepanduan kepemimpinan.',
+      full_content: `Pramuka SMA Labschool UNESA 1 merupakan wadah pembinaan watak, keterampilan hidup (survival skill), kedisiplinan, serta cinta tanah air. Didukung pelatih bersertifikasi pembina nasional, anggota dilatih navigasi darat, pionering, bakti sosial, dan kepemimpinan beregu.\n\nEkskul ini aktif mengirimkan kontingen ke Jambore Daerah, Raimuna Nasional, hingga perkemahan bakti kemasyarakatan.`,
+      schedule: 'Setiap Jumat sore pukul 15.30 - 17.00 WIB',
+      image_url: 'https://images.unsplash.com/photo-1576135245831-7bcab06b4ff0?q=80&w=800',
+      achievements: [
+        {
+          title: 'Juara 1 Lomba Tingkat Regu Prestasi Jawa Timur',
+          year: '2025',
+          event: 'Kwarda Gerakan Pramuka Jawa Timur',
+          image_url: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?q=80&w=400',
+        },
+        {
+          title: 'Juara Umum Pionering Kreatif & Ketangkasan Sandi',
+          year: '2024',
+          event: 'Giat Prestasi Penegak Surabaya',
+          image_url: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=400',
+        },
+        {
+          title: 'Kontingen Terdisiplin Kemah Bakti Pelajar UNESA',
+          year: '2024',
+          event: 'Dies Natalis Universitas Negeri Surabaya',
+          image_url: 'https://images.unsplash.com/photo-1576135245831-7bcab06b4ff0?q=80&w=400',
+        },
+      ],
+      moments: [
+        { url: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?q=80&w=800', caption: 'Kegiatan orientasi lapangan dan penjelajahan alam' },
+        { url: 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=800', caption: 'Latihan pionering dan tali-temali beregu' },
+      ],
+    },
+    {
+      id: 'ex-2',
+      name: 'Sanggar Seni Tari & Karawitan',
+      category: 'Seni & Budaya',
+      description: 'Eksplorasi kreasi seni tari tradisional Nusantara dan modern kontemporer.',
+      full_content: `Sanggar tari SMA Labschool mewadahi kreativitas seni gerak tari tradisional Jawa Timur, Nusantara, hingga koreografi kontemporer. Siswa rutin tampil dalam upacara kehormatan, festival seni antarsekolah, dan muhibah seni mancanegara.`,
+      schedule: 'Setiap Rabu & Sabtu pukul 15.30 WIB',
+      image_url: 'https://images.unsplash.com/photo-1508700922718-d4567acfa2d0?q=80&w=800',
+      achievements: [
+        {
+          title: 'Juara 1 FLS2N Festival Seni Tari Tradisional Jawa Timur',
+          year: '2025',
+          event: 'Dinas Pendidikan Provinsi Jawa Timur',
+          image_url: 'https://images.unsplash.com/photo-1508700922718-d4567acfa2d0?q=80&w=400',
+        },
+        {
+          title: 'Penyaji Terbaik Parade Seni Tari Nusantara',
+          year: '2024',
+          event: 'Festival Budaya Pelajar Surabaya',
+          image_url: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=400',
+        },
+        {
+          title: 'Juara 2 Koreografi Tari Kontemporer Pelajar',
+          year: '2024',
+          event: 'Pentas Seni Kreasi Muda Jawa Timur',
+          image_url: 'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?q=80&w=400',
+        },
+      ],
+      moments: [
+        { url: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=800', caption: 'Penampilan tari Remo kolosal pada acara wisuda' },
+        { url: 'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?q=80&w=800', caption: 'Latihan gerak tari kontemporer di studio seni' },
+      ],
+    },
+    {
+      id: 'ex-3',
+      name: 'Tim Basket Labschool Wolves',
+      category: 'Olahraga Prestasi',
+      description: 'Klub basket unggulan dengan pelatih profesional, aktif berkompetisi di DBL dan kejuaraan nasional.',
+      full_content: `Tim Basket Labschool Wolves merupakan salah satu tim basket sekolah paling disegani di Surabaya. Dengan fasilitas lapangan indoor berstandar FIBA dan pelatih lisensi nasional, tim rutin meloloskan pemain ke kejuaraan tingkat provinsi dan DBL.`,
+      schedule: 'Setiap Selasa & Kamis pukul 16.00 WIB',
+      image_url: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=800',
+      achievements: [
+        {
+          title: 'Champion DBL East Java Series (Surabaya North Region)',
+          year: '2025',
+          event: 'Developmental Basketball League (DBL)',
+          image_url: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=400',
+        },
+        {
+          title: 'Juara 1 Turnamen Invitasi Walikota Cup Surabaya',
+          year: '2024',
+          event: 'Perbasi Surabaya',
+          image_url: 'https://images.unsplash.com/photo-1519766304817-4f37bda74a29?q=80&w=400',
+        },
+        {
+          title: 'Runner-up Kejuaraan Basket Pelajar Antar SMA se-Jawa Timur',
+          year: '2024',
+          event: 'Piala Rektor UNESA',
+          image_url: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=400',
+        },
+      ],
+      moments: [
+        { url: 'https://images.unsplash.com/photo-1519766304817-4f37bda74a29?q=80&w=800', caption: 'Pertandingan sengit babak playoff turnamen DBL' },
+        { url: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=800', caption: 'Latihan taktik fisik dan shooting di lapangan indoor' },
+      ],
+    },
+    {
+      id: 'ex-4',
+      name: 'Robotics & IoT Innovators',
+      category: 'Teknologi & Riset',
+      description: 'Klub perakitan robot line follower, soccer robot, IoT controller, dan inovasi automasi.',
+      full_content: `Klub robotika menjadi wadah riset terapan bagi siswa yang tertarik pada elektronika, mikroprosesor Arduino, ESP32, dan kecerdasan buatan. Tim rutin meraih medali juara pada Kontes Robot Indonesia tingkat pelajar dan lomba karya ilmiah remaja.`,
+      schedule: 'Setiap Sabtu pukul 09.00 - 12.00 WIB',
+      image_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800',
+      achievements: [
+        {
+          title: 'Medali Emas Kontes Robot Pintar Indonesia (KRPI)',
+          year: '2025',
+          event: 'Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi',
+          image_url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=400',
+        },
+        {
+          title: 'Juara 1 National IoT Hackathon Pelajar Inovatif',
+          year: '2025',
+          event: 'Institut Teknologi Sepuluh Nopember (ITS)',
+          image_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=400',
+        },
+        {
+          title: 'Juara 2 Autonomous Line Follower Challenge',
+          year: '2024',
+          event: 'Robotics Olympiad Jawa Timur',
+          image_url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=400',
+        },
+      ],
+      moments: [
+        { url: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=800', caption: 'Uji coba lintasan robot line follower berkecepatan tinggi' },
+        { url: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=800', caption: 'Presentasi prototipe sistem pendeteksi kebocoran gas IoT' },
+      ],
+    },
   ];
+}
+
+export async function fetchDetailItem(type, id) {
+  if (type === 'program') {
+    const list = await fetchPrograms();
+    // Special mapping: if bahasa, preuni, or language-preuni, map to the combined language & preuni program
+    if (id === 'language-preuni' || id === 'bahasa' || id === 'preuni') {
+      const combined = list.find((item) => item.slug === 'bahasa');
+      if (combined) {
+        return {
+          ...combined,
+          slug: 'language-preuni',
+          title: 'Sekolah 5 Bahasa & Pre-University Pathways',
+          badge_text: 'Komunikasi Global & Jalur Kuliah Bahasa',
+        };
+      }
+    }
+    return list.find((item) => String(item.id) === String(id) || String(item.slug) === String(id));
+  }
+  if (type === 'faculty' || type === 'teacher') {
+    const list = await fetchFaculty();
+    return list.find((item) => String(item.id) === String(id));
+  }
+  if (type === 'activity') {
+    const list = await fetchActivities();
+    return list.find((item) => String(item.id) === String(id));
+  }
+  if (type === 'ekskul' || type === 'extracurricular') {
+    const list = await fetchExtracurriculars();
+    return list.find((item) => String(item.id) === String(id));
+  }
+  return null;
 }
 
 export async function fetchSettings() {

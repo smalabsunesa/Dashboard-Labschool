@@ -1,57 +1,42 @@
-import React from 'react';
-import { Sparkles, GraduationCap, Globe, BookOpen, Users, BarChart3, Quote, Target, Flag } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sparkles, GraduationCap, Globe, BookOpen, Users, BarChart3, Quote, Target, Flag, ArrowUpRight } from 'lucide-react';
 import SectionWrapper from './SectionWrapper';
 import ImageWithSkeleton from '../common/ImageWithSkeleton';
-
-const pilarUnggulan = [
-  {
-    id: 'sks',
-    title: 'Sistem Kredit Semester (SKS)',
-    desc: 'Sistem pembelajaran fleksibel yang memungkinkan peserta didik menyelesaikan masa studi sesuai kecepatan belajar individual.',
-    icon: GraduationCap,
-    circleBg: 'bg-[#002B66]', // Dark Navy
-    badgeText: 'Kurikulum Fleksibel',
-  },
-  {
-    id: 'bahasa',
-    title: 'Sekolah 5 Bahasa',
-    desc: 'Penguasaan Bahasa Indonesia, Inggris, Jepang, Mandarin, & Arab untuk komunikasi internasional unggul.',
-    icon: Globe,
-    circleBg: 'bg-[#F59E0B]', // Amber Gold
-    badgeText: 'Komunikasi Global',
-  },
-  {
-    id: 'digital',
-    title: 'Digital Learning',
-    desc: 'Ekosistem belajar modern terintegrasi platform digital, Smart Classroom, Lab Robotika, & penerapan AI.',
-    icon: BookOpen,
-    circleBg: 'bg-[#002B66]', // Dark Navy
-    badgeText: 'Fasilitas Modern',
-  },
-  {
-    id: 'international',
-    title: 'International Program',
-    desc: 'Sister School dengan sekolah internasional di Asia & Australia, mencakup pertukaran pelajar & budaya.',
-    icon: Users,
-    circleBg: 'bg-[#002B66]', // Dark Navy
-    badgeText: 'Wawasan Internasional',
-  },
-  {
-    id: 'preuni',
-    title: 'Pre-University Class',
-    desc: 'Bimbingan intensif persiapan tembus PTN favorit (SNBP/SNBT), olimpiade sains, & kuliah luar negeri.',
-    icon: BarChart3,
-    circleBg: 'bg-[#F59E0B]', // Amber Gold
-    badgeText: 'Sukses PTN & Overseas',
-  },
-];
-
+import DetailModalViewer from '../common/DetailModalViewer';
 import { useQuery } from '@tanstack/react-query';
-import { fetchSettings, fetchFaculty } from '../../lib/api';
+import { fetchSettings, fetchFaculty, fetchPrograms } from '../../lib/api';
+
+const ICON_MAP = {
+  sks: { icon: GraduationCap, circleBg: 'bg-[#002B66]' },
+  bahasa: { icon: Globe, circleBg: 'bg-[#F59E0B]' },
+  digital: { icon: BookOpen, circleBg: 'bg-[#002B66]' },
+  international: { icon: Users, circleBg: 'bg-[#002B66]' },
+  preuni: { icon: BarChart3, circleBg: 'bg-[#F59E0B]' },
+};
 
 export default function AboutSection() {
   const { data: settings = {} } = useQuery({ queryKey: ['settings'], queryFn: fetchSettings });
   const { data: facultyMembers = [] } = useQuery({ queryKey: ['faculty'], queryFn: fetchFaculty });
+  const { data: programs = [] } = useQuery({ queryKey: ['programs'], queryFn: fetchPrograms });
+
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Listen for custom event from Hero section
+  useEffect(() => {
+    const handleOpenModal = (event) => {
+      const slug = event.detail?.slug;
+      if (!slug || !programs.length) return;
+      const found = programs.find((p) => p.slug === slug || String(p.id) === String(slug));
+      if (found) {
+        setSelectedProgram(found);
+        setIsModalOpen(true);
+      }
+    };
+
+    window.addEventListener('open-program-modal', handleOpenModal);
+    return () => window.removeEventListener('open-program-modal', handleOpenModal);
+  }, [programs]);
 
   const principalTeacher = facultyMembers.find(
     (f) => f.role && f.role.toLowerCase().includes('kepala sekolah')
@@ -179,34 +164,54 @@ export default function AboutSection() {
               5 Pilar Unggulan Akademik
             </h3>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Program unggulan SMA Labschool UNESA 1 dalam mencetak lulusan berkarakter & kompeten.
+              Klik pada salah satu pilar untuk melihat ringkasan, foto kegiatan, dan informasi lengkap.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {pilarUnggulan.map((prog) => {
-              const IconComp = prog.icon;
+            {programs.map((prog) => {
+              const iconMeta = ICON_MAP[prog.slug] || { icon: Sparkles, circleBg: 'bg-[#002B66]' };
+              const IconComp = iconMeta.icon;
               return (
                 <div
                   key={prog.id}
-                  className="group rounded-2xl bg-white border border-slate-200/90 p-5 shadow-sm hover:shadow-md hover:border-orange-300 transition-all duration-300 flex flex-col justify-between hover:-translate-y-1"
+                  onClick={() => {
+                    setSelectedProgram(prog);
+                    setIsModalOpen(true);
+                  }}
+                  className="group cursor-pointer rounded-2xl bg-white border border-slate-200/90 p-5 shadow-sm hover:shadow-xl hover:border-orange-400 transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 relative"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedProgram(prog);
+                      setIsModalOpen(true);
+                    }
+                  }}
                 >
                   <div>
                     {/* Colored Circle Icon Badge */}
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-md ${prog.circleBg} mb-3 group-hover:scale-105 transition-transform`}>
-                      <IconComp size={24} />
+                    <div className="flex items-center justify-between mb-3">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-md ${iconMeta.circleBg} group-hover:scale-105 transition-transform`}>
+                        <IconComp size={24} />
+                      </div>
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full bg-orange-50 text-orange-600">
+                        <ArrowUpRight size={16} />
+                      </span>
                     </div>
 
                     <h4 className="font-bold text-slate-900 text-sm group-hover:text-orange-600 transition-colors leading-snug">
                       {prog.title}
                     </h4>
-                    <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                      {prog.desc}
+                    <p className="mt-2 text-xs text-slate-500 leading-relaxed line-clamp-3">
+                      {prog.description}
                     </p>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-100 text-[0.65rem] font-extrabold text-orange-600">
-                    {prog.badgeText}
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[0.68rem] font-bold text-orange-600">
+                    <span>{prog.badge_text || 'Program Unggulan'}</span>
+                    <span className="text-slate-400 group-hover:text-orange-600 font-medium">Lihat &rarr;</span>
                   </div>
                 </div>
               );
@@ -214,6 +219,14 @@ export default function AboutSection() {
           </div>
         </div>
       </div>
+
+      {/* Universal Pop-up Modal */}
+      <DetailModalViewer
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        data={selectedProgram}
+        type="program"
+      />
     </SectionWrapper>
   );
 }

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
+import DetailPage from './pages/DetailPage';
 import AdminApp from './admin/index';
 import './index.css';
 import { queryClient } from './lib/react-query/queryClient';
@@ -19,6 +20,7 @@ ReactDOM.createRoot(rootElement).render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />} />
+          <Route path="/detail/:type/:id" element={<DetailPage />} />
           {/* Admin CMS — no links from public site, only accessible via /admin URL */}
           <Route path="/admin/*" element={<AdminApp />} />
         </Routes>

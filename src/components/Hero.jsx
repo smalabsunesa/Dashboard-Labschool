@@ -146,30 +146,40 @@ export default function Hero() {
             {programCards.map((card) => {
               const IconComponent = card.icon;
               return (
-                <div
+                <button
                   key={card.id}
-                  className="rounded-[22px] bg-white border border-slate-200/90 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-3.5 flex items-center gap-3.5"
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById('about');
+                    if (el) {
+                      el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    setTimeout(() => {
+                      window.dispatchEvent(new CustomEvent('open-program-modal', { detail: { slug: card.id } }));
+                    }, 400);
+                  }}
+                  className="group text-left w-full rounded-[22px] bg-white border border-slate-200/90 shadow-md hover:shadow-xl hover:-translate-y-1 hover:border-blue-400 active:scale-95 transition-all duration-300 p-3.5 flex items-center gap-3.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                 >
                   {/* Left Circle Icon Badge */}
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0 shadow-sm ${card.circleBg}`}>
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white shrink-0 shadow-sm transition-transform group-hover:scale-105 ${card.circleBg}`}>
                     <IconComponent size={24} strokeWidth={2.2} />
                   </div>
 
                   {/* Vertical Divider */}
-                  <div className="h-10 w-[1.5px] bg-slate-300/80 shrink-0" />
+                  <div className="h-10 w-[1.5px] bg-slate-300/80 shrink-0 group-hover:bg-blue-400 transition-colors" />
 
                   {/* Right Text Container */}
                   <div className="flex flex-col justify-center">
                     {card.titleLines.map((line, idx) => (
                       <span
                         key={idx}
-                        className="font-extrabold text-[#002B66] text-xs sm:text-[0.78rem] tracking-wider leading-[1.2] uppercase font-sans"
+                        className="font-extrabold text-[#002B66] group-hover:text-blue-600 transition-colors text-xs sm:text-[0.78rem] tracking-wider leading-[1.2] uppercase font-sans"
                       >
                         {line}
                       </span>
                     ))}
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>

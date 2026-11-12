@@ -5,6 +5,7 @@ import AdminSidebar from './components/AdminSidebar';
 import AdminHeader from './components/AdminHeader';
 import AdminDashboard from './AdminDashboard';
 import NewsManager from './pages/NewsManager';
+import ProgramManager from './pages/ProgramManager';
 import FaqManager from './pages/FaqManager';
 import InquiriesViewer from './pages/InquiriesViewer';
 import FacultyManager from './pages/FacultyManager';
@@ -14,6 +15,7 @@ import SettingsManager from './pages/SettingsManager';
 
 const PAGE_TITLES = {
   '/admin': 'Dashboard',
+  '/admin/programs': 'Program Unggulan',
   '/admin/news': 'Manajemen Berita',
   '/admin/faqs': 'Manajemen FAQ',
   '/admin/inquiries': 'Pesan Masuk',
@@ -38,6 +40,7 @@ function AdminLayout({ onLogout }) {
         <main className="flex-1 overflow-y-auto p-6">
           <Routes>
             <Route path="/" element={<AdminDashboard />} />
+            <Route path="/programs" element={<ProgramManager />} />
             <Route path="/news" element={<NewsManager />} />
             <Route path="/faqs" element={<FaqManager />} />
             <Route path="/inquiries" element={<InquiriesViewer />} />
