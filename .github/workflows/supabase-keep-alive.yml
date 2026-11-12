@@ -1,0 +1,47 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Berjalan setiap 4 hari sekali jam 00:00 UTC (supaya tidak melewati batas 7 hari)
+    - cron: '0 0 */4 * *'
+  workflow_dispatch: # Mengizinkan pengujian manual kapan saja lewat tombol "Run workflow" di GitHub Actions
+
+jobs:
+  ping-supabase:
+    name: Ping Supabase Database & REST API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping Supabase REST API
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "::error::Secret VITE_SUPABASE_URL atau VITE_SUPABASE_ANON_KEY belum ditambahkan di Repository Settings -> Secrets and variables -> Actions!"
+            exit 1
+          fi
+
+          # Hapus trailing slash jika ada
+          CLEAN_URL="${SUPABASE_URL%/}"
+
+          echo "Pinging Supabase at: $CLEAN_URL/rest/v1/smal_updates ..."
+
+          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET \
+            "$CLEAN_URL/rest/v1/smal_updates?select=id&limit=1" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -H "Content-Type: application/json")
+
+          HTTP_BODY=$(echo "$HTTP_RESPONSE" | sed '$d')
+          HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tail -n1)
+
+          echo "HTTP Status Code: $HTTP_STATUS"
+          echo "Response Body: $HTTP_BODY"
+
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 400 ]; then
+            echo "✅ Sukses! Supabase berhasil di-ping dan server tetap aktif."
+          else
+            echo "::warning::Mendapat respon HTTP $HTTP_STATUS dari Supabase."
+          fi
+
